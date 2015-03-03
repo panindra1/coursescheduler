@@ -1,5 +1,5 @@
 package coursescheduler;
-import java.util.List;
+import java.util.Set;
 
 /*
  * To change this license header, choose License Headers in Project Properties.
@@ -14,7 +14,7 @@ public class Course {
     private int creditHours;
     private int springCost;
     private int fallCost;
-    private List<Integer> prerequistes;
+    private Set<Course> prerequistes;
 
     public int getCreditHours() {
         return creditHours;
@@ -40,11 +40,18 @@ public class Course {
         this.fallCost = fallCost;
     }
 
-    public List<Integer> getPrerequistes() {
+    public Set<Course> getPrerequistes() {
         return prerequistes;
     }
 
-    public void setPrerequistes(List<Integer> prerequistes) {
+    public void setPrerequistes(Set<Course> prerequistes) {
         this.prerequistes = prerequistes;
     }
+
+	@Override
+	public String toString() {
+		return "Course [creditHours=" + creditHours + ", springCost="
+				+ springCost + ", fallCost=" + fallCost + ", prerequistes="
+				+ prerequistes + "]";
+	}
 }
