@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -65,4 +66,19 @@ public class CourseScheduler {
 		
 		System.out.println(student);
     }
+    
+    private Course chooseInterestingCourse(ArrayList<Course> courses) {
+        Course course = null;
+        for(int i = 0; i < courses.size(); i++) {
+           if(course.isInteresting() && (course.getPrerequistes().size() == 0 /*|| course.isPrerequisitesFullfilled()*/ ) ) {
+               if(course.getFallCost() > course.getSpringCost()) {
+                   
+               }
+           }
+        }
+        return course;
+    }
+    
+    
+    
 }

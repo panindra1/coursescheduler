@@ -1,4 +1,5 @@
 package coursescheduler;
+import java.util.List;
 import java.util.Set;
 
 /*
@@ -14,8 +15,21 @@ public class Course {
     private int creditHours;
     private int springCost;
     private int fallCost;
+    private List<Boolean> completedPrerequistes;
+    private boolean interesting;
     private Set<Course> prerequistes;
 
+    Course() {
+    }
+    
+    public boolean isInteresting() {
+        return interesting;
+    }
+
+    public void setInteresting(boolean interesting) {
+        this.interesting = interesting;
+    }
+    
     public int getCreditHours() {
         return creditHours;
     }
