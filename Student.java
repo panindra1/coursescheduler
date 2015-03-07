@@ -11,6 +11,8 @@ import java.util.Set;
  *
  * @author panindra
  */
+enum semesterType {FALL, SPRING};
+
 public class Student {
     int numSemesters;
     int numCourses;
@@ -18,9 +20,19 @@ public class Student {
     int minCreditPerSem;
     int maxCreditPerSem;
     int maxCost;
+    semesterType currSemester;
+
+    public semesterType getCurrSemester() {
+        return currSemester;
+    }
+
+    public void setCurrSemester(semesterType currSemester) {
+        this.currSemester = currSemester;
+    }
     Set<Course> allCourses;
     Set<Course> interestingCourses;
-
+    
+    
     public int getNumSemesters() {
         return numSemesters;
     }

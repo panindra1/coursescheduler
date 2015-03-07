@@ -13,6 +13,15 @@ import java.util.Set;
  */
 public class Course {
     private int creditHours;
+    private int courseNumber;
+
+    public int getCourseNumber() {
+        return courseNumber;
+    }
+
+    public void setCourseNumber(int courseNumber) {
+        this.courseNumber = courseNumber;
+    }
     private int springCost;
     private int fallCost;
     private List<Boolean> completedPrerequistes;
