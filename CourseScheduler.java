@@ -32,8 +32,9 @@ public class CourseScheduler {
     static ArrayList<Course> interestingCourseList = new ArrayList<Course>();
     static int mInterestingCourseCounter = 0;
     
-    
     static int mCmax = 50;
+    static int mCmin = 10;
+    
     public static void main(String args[])
     	throws IOException
     {
@@ -93,7 +94,7 @@ public class CourseScheduler {
         student.setCurrSemester(semesterType.FALL);
         //System.out.println(student);
         int semesterCounter = 0;
-        while(mInterestingCourseCounter < interstingCoursesStrArr.length) {
+        while(mInterestingCourseCounter < student.interestingCourses.size()) {
             if(semesterCounter % 2 == 0) {
                 student.setCurrSemester(semesterType.FALL);
             }
@@ -101,22 +102,23 @@ public class CourseScheduler {
                 student.setCurrSemester(semesterType.SPRING);
             }
             semesterCounter++;
-            Set<Course> CourseSet = chooseInterestingCourse(allCourses);
+            Set<Course> CourseSet = chooseInterestingCourse(allCourses, false, student.getCurrSemester());
             for(Course course : CourseSet) {
                 mCompletedCourseMap.put(course.getCourseNumber(), true);
                 System.out.println("Course Number : " + course.getCourseNumber() + "    Credit hours :"+ course.getCreditHours());
+                if(course.isInteresting())
+                    mInterestingCourseCounter++;
             }
             System.out.println("----------------------------");
         }
     }
     
-    static private Set<Course> chooseInterestingCourse(Set<Course> courses) {
+    static private Set<Course> chooseInterestingCourse(Set<Course> courses, boolean costInformation, semesterType type) {
         for(Course course: courses){
             if(course.isInteresting()){
                 interestingCourseList.add(course);
             }
         }
-        
         
          Set<Course> CourseSet = new HashSet<Course>();
         int creditHours = 0;
@@ -129,8 +131,11 @@ public class CourseScheduler {
                }
                if(!mCompletedCourseMap.containsKey(course.getCourseNumber())){
                    if( (creditHours + course.getCreditHours()) <= mCmax ) {
+                       /*if(! (costInformation && chooseSemester(course, type) )) {
+                           continue;
+                       } */
                         creditHours += course.getCreditHours();
-                        mInterestingCourseCounter++;
+                        //mInterestingCourseCounter++;
                         //mCompletedCourseMap.put(course.getCourseNumber(), true);
                         CourseSet.add(course);
                         int counter = 0;
@@ -158,10 +163,16 @@ public class CourseScheduler {
             key = entry.getKey();
             value = entry.getValue();
             if(creditHours < mCmax){
+                
                 if(!mCompletedCourseMap.containsKey(key)){
                     for(Course c : courses){
+                        
                         if(c.getCourseNumber() == key &&  ((creditHours + c.getCreditHours()) <= mCmax) && checkIfPrerequisitesCompleted(c) ){
+                       /*    if(! (costInformation && chooseSemester(c, type) )) {
+                                continue;
+                            }*/
                             creditHours+=c.getCreditHours();
+                            
                            // mCompletedCourseMap.put(key, Boolean.TRUE);
                             CourseSet.add(c);
                             int counter = 0;
@@ -183,18 +194,18 @@ public class CourseScheduler {
                         }
                     }
                 }
-
-
             }
             else {
                 return CourseSet;
             }
-
         }
         
         for(Course remainingCourse : courses){
             if(!remainingCourse.isInteresting() &&  !mCompletedCourseMap.containsKey(remainingCourse.getCourseNumber()) && checkIfPrerequisitesCompleted(remainingCourse)){
                 if( (creditHours + remainingCourse.getCreditHours()) <= mCmax ) {
+                    /*if(! (costInformation && chooseSemester(remainingCourse, type) )) {
+                           continue;
+                    }*/
                     creditHours+=remainingCourse.getCreditHours();
                     //mCompletedCourseMap.put(remainingCourse.getCourseNumber(), Boolean.TRUE);
                     CourseSet.add(remainingCourse);
