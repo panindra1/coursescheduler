@@ -184,13 +184,14 @@ public class CourseScheduler1 {
                     root.setSemesterNumber(1);
                    // break;
                     recursiveBacktracking(root);            
-                     //break;
+                    // break;
                 }
             }
            
             CourseTreeNode result = mResultQueue.poll();
+            System.out.println(result.parent.getTotalCost() + "  " + result.getSemesterNumber());
             printTree(result);
-            System.out.println(result.getTotalCost());
+            
        //}
     }
     
@@ -496,9 +497,50 @@ public class CourseScheduler1 {
     }
     
     static public void printTree(CourseTreeNode node) {
-        while(node != null) {
-            System.out.println(node.course.getCourseNumber() + " : "+ node.getSemesterNumber() + " : "+node.getTotalCost());
-            node = node.parent;
+        CourseTreeNode root = node.parent;
+        Map<Integer, ArrayList<Integer>> resultMap = new HashMap<Integer, ArrayList<Integer>>();
+        Map<Integer, Integer> courseMap = new HashMap<Integer, Integer>();
+        //ArrayList<Integer> values = new ArrayList<Integer>();
+        
+        while(root != null) {
+            if(resultMap.containsKey(root.getSemesterNumber())) {
+                ArrayList<Integer> values = resultMap.get(root.getSemesterNumber());
+                values.add(root.course.getCourseNumber());
+                resultMap.put(root.getSemesterNumber(), values);
+                int previousCost = courseMap.get(root.getSemesterNumber());
+                if(root.getSemesterNumber() %2 == 1) {                    
+                    courseMap.put(root.getSemesterNumber(), previousCost + root.course.getFallCost());
+                }
+                else {
+                    courseMap.put(root.getSemesterNumber(), previousCost + root.course.getSpringCost());
+                }
+            }
+            else {
+                ArrayList<Integer> values = new ArrayList<Integer>();
+                values.add(root.course.getCourseNumber());
+                resultMap.put(root.getSemesterNumber(), values);
+                if(root.getSemesterNumber() %2 == 1) {                    
+                    courseMap.put(root.getSemesterNumber(), root.course.getFallCost());
+                }
+                else {
+                    courseMap.put(root.getSemesterNumber(), root.course.getSpringCost());
+                }
+            }
+            //System.out.println(root.course.getCourseNumber() + " : "+ root.getSemesterNumber() + " : "+root.getTotalCost());
+            root = root.parent;
         }
-    }
+        
+        for (Map.Entry<Integer, ArrayList<Integer>> entry : resultMap.entrySet()) {
+            String key = entry.getKey().toString();        
+            ArrayList<Integer> value = entry.getValue();
+            System.out.println(value.size() +"  "+ value);            
+        }
+        
+        for (Map.Entry<Integer, Integer> entry : courseMap.entrySet()) {
+            String key = entry.getKey().toString();        
+            Integer value = entry.getValue();
+            System.out.print(value + " ");            
+        }
+        System.out.println();
+    }   
 }
