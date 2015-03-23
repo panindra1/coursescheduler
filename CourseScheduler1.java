@@ -13,21 +13,19 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.PriorityQueue;
-import java.util.Set;
 
 /**
  *
  * @author panindra
  */
 
- class CourseScheduler11 {
+public class CourseScheduler1 {
 
     /**
      * @param args the command line arguments
@@ -52,7 +50,7 @@ import java.util.Set;
     public static void main(String args[])
     	throws IOException
     {
-        File file = new File("thirdScenario.txt");
+        File file = new File("fourthScenario.txt");
         BufferedReader br =
                 new BufferedReader(new FileReader(file));
         Student student = new Student();
@@ -157,8 +155,7 @@ import java.util.Set;
                     }
                     else {
                         mPrerequisitesMap.put(prereq.getCourseNumber(), 1);
-                    }
-                    //}
+                    }         
                 }
             }
         }
@@ -187,7 +184,7 @@ import java.util.Set;
                     root.setSemesterNumber(1);
                    // break;
                     recursiveBacktracking(root);            
-                     //break;
+                    // break;
                 }
             }
            
@@ -208,7 +205,7 @@ import java.util.Set;
             }
             mFinalNode = null;
             mInterestingCourseCompleted = false;
-            return;
+            //return;
         }
         root.finishedCourses.add(root.course.getCourseNumber());
         ArrayList<Course> childCourses = new ArrayList<>();
@@ -260,11 +257,7 @@ import java.util.Set;
                             }
                         }
                     }
-                    /*
-                    if(prereqSet !=null && prereqSet.contains(checkRoot.course)) {
-                        changeSem = true;
-                        break;                       
-                    } */                  
+                  
                     checkRoot = checkRoot.parent;
                  }
 
@@ -275,32 +268,9 @@ import java.util.Set;
                 else{
                     ctNode.setSemesterNumber(root.getSemesterNumber());
                 
-                } 
-                
-                //if the course has no pre reqs -> then add to the current semester itself
-//                if(prereqSet != null && prereqSet.isEmpty()){
-//                    ctNode.setSemesterNumber(root.getSemesterNumber());
-//                }
-                /*ctNode.setSemesterNumber(root.getSemesterNumber());
-                
-                checkRoot = root;
-                boolean flag = false;
-                int rootSemester = root.getSemesterNumber();
-                
-                while (checkRoot != null && checkRoot.getSemesterNumber() == rootSemester) {
-                   if(prereqSet !=null && prereqSet.contains(checkRoot.course)) {
-                       flag = true;
-                       break;                       
-                   }                   
-                   checkRoot = checkRoot.parent;
-                }   
-                
-                if(flag) {
-                    continue;
-                }*/
+                }                 
             }
-            else {
-               
+            else {               
                 //check if the roots > Cmin
                 checkRoot = root;
                 boolean isCminReached = false;
@@ -311,10 +281,6 @@ import java.util.Set;
                 if(totalSemCreditHrs >= mCmin){
                     isCminReached = true;
                 }
-                
-                /*if(totalSemCreditHrs >= mCmax){
-                    isCmaxReached = true;
-                }*/
                 
                 if(!isCminReached  && totalSemCreditHrs >= mCmax){
                    isCmaxReached = true; 
@@ -357,12 +323,7 @@ import java.util.Set;
                 
                         }
                     }                    
-                }
-                
-                /*if(prereqSet!=null && prereqSet.isEmpty()){
-                    ctNode.setSemesterNumber(root.getSemesterNumber());
-                }
-                ctNode.setSemesterNumber(root.getSemesterNumber() + 1);*/
+                }                
             }
             
             semesterType type = semesterType.FALL;
@@ -376,8 +337,8 @@ import java.util.Set;
                 ctNode.setTotalCost(ctNode.course.getFallCost() + root.getTotalCost());
             }
             
-           /* if(!chooseSemester(childCourses.get(i), type))
-                continue;*/
+            if(!chooseSemester(childCourses.get(i), type) /*&& !childCourses.get(i).isInteresting()*/) //uncomment for first 
+                continue;
             
            if( (root.getTotalCost()  + currentCost ) < mBudget) {
                // System.out.println("CHildren of root :" + ctNode.course.getCourseNumber() + "  Smester "+ ctNode.getSemesterNumber());

@@ -27,7 +27,7 @@ import java.util.Set;
  * @author panindra
  */
 
-public class CourseScheduler1 {
+ class CourseScheduler12 {
 
     /**
      * @param args the command line arguments
@@ -35,7 +35,7 @@ public class CourseScheduler1 {
     static HashMap<Integer, Boolean> mCompletedCourseMap = new HashMap<Integer, Boolean>();
     static HashMap<Integer, Integer> mPrerequisitesMap = new HashMap<Integer, Integer>();
     static ArrayList<Integer> mInterestingCourseList = new ArrayList<>();
-    static Set<Course> mAllCourses = new HashSet<Course>();
+    static ArrayList<Course> mAllCourses = new ArrayList<Course>();
     static int mInterestingCourseCounter = 0;
     static CourseTreeNode mFinalNode = null;
     static PriorityQueue<Course> mFallPriorityQueue;
@@ -51,7 +51,7 @@ public class CourseScheduler1 {
     public static void main(String args[])
     	throws IOException
     {
-        File file = new File("secondScenario.txt");
+        File file = new File("fourthScenario.txt");
         BufferedReader br =
                 new BufferedReader(new FileReader(file));
         Student student = new Student();
@@ -81,8 +81,8 @@ public class CourseScheduler1 {
             String prereqLine = br.readLine();
             if("0".equals(prereqLine)) continue;
             String[] prereqs = prereqLine.split(" ");
-            Set<Course> prereqSet = courseArray[i].getPrerequistes();
-            if(prereqSet == null) prereqSet = new HashSet<Course>();
+            ArrayList<Course> prereqSet = courseArray[i].getPrerequistes();
+            if(prereqSet == null) prereqSet = new ArrayList<Course>();
             
             for(int j = 1 ; j < prereqs.length ; j ++)
             {
@@ -97,7 +97,7 @@ public class CourseScheduler1 {
         
         student.allCourses = mAllCourses;
         String[] interstingCoursesStrArr = br.readLine().split(" ");
-        student.interestingCourses = new HashSet<Course>();
+        student.interestingCourses = new ArrayList<Course>();
         for(String interestingCourseStr : interstingCoursesStrArr)
         {
             if(interestingCourseStr == interstingCoursesStrArr[0])
@@ -135,7 +135,7 @@ public class CourseScheduler1 {
             });
         
         for(Course course : mAllCourses) {
-            Set<Course> prereqSet = course.getPrerequistes();
+            ArrayList<Course> prereqSet = course.getPrerequistes();
             if(prereqSet != null) {
                 for(Course prereq: prereqSet) {
                    // if(course.isInteresting()) {
@@ -211,7 +211,7 @@ public class CourseScheduler1 {
             
             boolean checkAddCourse = checkToAddNode(root, ctNode);
             
-            Set<Course> prereqSet = childCourses.get(i).getPrerequistes();
+            ArrayList<Course> prereqSet = childCourses.get(i).getPrerequistes();
             CourseTreeNode checkRoot = new CourseTreeNode();
             int rootSemester = root.getSemesterNumber();
             boolean changeSem = false;
@@ -228,15 +228,24 @@ public class CourseScheduler1 {
                 // check if course course has pre reqs that are satisfied in current sem -> then make ctNode.sem = currentSem + 1
                 checkRoot = root;
                 rootSemester = root.getSemesterNumber();
-                while (checkRoot != null && checkRoot.getSemesterNumber() == rootSemester) {
+                while (checkRoot != null && (checkRoot.getSemesterNumber() == rootSemester) ){
+                    if(prereqSet !=null) {
+                        for(Course course : prereqSet ) {
+                            if(course.getCourseNumber() == checkRoot.course.getCourseNumber()) {
+                                changeSem = true;
+                                break;                       
+                            }
+                        }
+                    }
+                    /*
                     if(prereqSet !=null && prereqSet.contains(checkRoot.course)) {
                         changeSem = true;
                         break;                       
-                    }                   
+                    } */                  
                     checkRoot = checkRoot.parent;
                  }
 
-                if(changeSem || totalSemCreditHrs + ctNode.course.getCreditHours() > mCmax) {
+                if(changeSem || (totalSemCreditHrs + ctNode.course.getCreditHours()) >= mCmax) {
                    ctNode.setSemesterNumber(root.getSemesterNumber() + 1);
                 }
                 
@@ -272,7 +281,7 @@ public class CourseScheduler1 {
                 //check if the roots > Cmin
                 checkRoot = root;
                 boolean isCminReached = false;
-                boolean isCmaxReached = true;
+                boolean isCmaxReached = false;
                 rootSemester = root.getSemesterNumber();
                 
                 
@@ -280,11 +289,15 @@ public class CourseScheduler1 {
                     isCminReached = true;
                 }
                 
-                if(isCminReached){
-                   isCmaxReached = false; 
+                /*if(totalSemCreditHrs >= mCmax){
+                    isCmaxReached = true;
+                }*/
+                
+                if(!isCminReached  && totalSemCreditHrs >= mCmax){
+                   isCmaxReached = true; 
                 }
                 
-                if(prereqSet != null && prereqSet.isEmpty()){
+                if(prereqSet == null || (prereqSet != null && prereqSet.isEmpty())){
                     if(isCmaxReached ){
                         ctNode.setSemesterNumber(root.getSemesterNumber() + 1);
                     }
@@ -295,7 +308,7 @@ public class CourseScheduler1 {
                 
                 else { //there exists some prereqs. Add them only if pre reqs are finished in semesters apart from parent semester
                     if(isCmaxReached){
-                        ctNode.setSemesterNumber(root.getSemesterNumber());
+                        ctNode.setSemesterNumber(root.getSemesterNumber() + 1);
                     }
                     else {
                         if(!isCminReached){
@@ -314,6 +327,9 @@ public class CourseScheduler1 {
                             
                             if(flag) {
                                continue;
+                            }
+                            else {
+                                ctNode.setSemesterNumber(rootSemester);
                             }
                 
                         }
@@ -364,7 +380,7 @@ public class CourseScheduler1 {
         int parentSemester = root.getSemesterNumber();
         int creditHours = 0;//
                 
-        while(root.parent != null && root.parent.getSemesterNumber() == parentSemester) {
+        while(root != null && root.getSemesterNumber() == parentSemester) {
             creditHours += root.course.getCreditHours();
             root = root.parent;
         }
@@ -389,7 +405,7 @@ public class CourseScheduler1 {
         return false;
     }
     
-    static ArrayList<Course> giveInterestingCourses(CourseTreeNode ctNode, Set <Course> allCourses ) {
+    static ArrayList<Course> giveInterestingCourses(CourseTreeNode ctNode, ArrayList <Course> allCourses ) {
         
         ArrayList<Course> nextCourseList = new ArrayList<>();
         for(Course course : allCourses){
@@ -441,7 +457,7 @@ public class CourseScheduler1 {
     static private boolean checkIfPrerequisitesCompleted(Course course, ArrayList<Integer> finishedList) {
         //System.out.println("inside Check prereq : ");
         //System.out.println    (course.getCourseNumber());
-        Set<Course> prereqSet = course.getPrerequistes();
+        ArrayList<Course> prereqSet = course.getPrerequistes();
         if(prereqSet != null){
             for(Course prerequisite : prereqSet) {
 
@@ -471,10 +487,10 @@ public class CourseScheduler1 {
     }
     
     public void addCourseNode(CourseTreeNode ctNodeParent, Course childCourse){
-            CourseTreeNode ctNodeChild = new CourseTreeNode();
-            ctNodeChild.course = childCourse;
-            ctNodeChild.parent = ctNodeParent;
-            ctNodeParent.child.add(ctNodeChild) ;
+        CourseTreeNode ctNodeChild = new CourseTreeNode();
+        ctNodeChild.course = childCourse;
+        ctNodeChild.parent = ctNodeParent;
+        ctNodeParent.child.add(ctNodeChild) ;
     }
     
     
@@ -503,9 +519,51 @@ public class CourseScheduler1 {
     }
     
     static public void printTree(CourseTreeNode node) {
-        while(node != null) {
-            System.out.println(node.course.getCourseNumber() + " : "+ node.getSemesterNumber() + " : "+node.getTotalCost());
-            node = node.parent;
+        CourseTreeNode root = node.parent;
+        System.out.println(node.parent.getTotalCost() + "  " + node.getSemesterNumber());
+        Map<Integer, ArrayList<Integer>> resultMap = new HashMap<Integer, ArrayList<Integer>>();
+        Map<Integer, Integer> courseMap = new HashMap<Integer, Integer>();
+        //ArrayList<Integer> values = new ArrayList<Integer>();
+        
+        while(root != null) {
+            if(resultMap.containsKey(root.getSemesterNumber())) {
+                ArrayList<Integer> values = resultMap.get(root.getSemesterNumber());
+                values.add(root.course.getCourseNumber());
+                resultMap.put(root.getSemesterNumber(), values);
+                int previousCost = courseMap.get(root.getSemesterNumber());
+                if(root.getSemesterNumber() %2 == 1) {                    
+                    courseMap.put(root.getSemesterNumber(), previousCost + root.course.getFallCost());
+                }
+                else {
+                    courseMap.put(root.getSemesterNumber(), previousCost + root.course.getSpringCost());
+                }
+            }
+            else {
+                ArrayList<Integer> values = new ArrayList<Integer>();
+                values.add(root.course.getCourseNumber());
+                resultMap.put(root.getSemesterNumber(), values);
+                if(root.getSemesterNumber() %2 == 1) {                    
+                    courseMap.put(root.getSemesterNumber(), root.course.getFallCost());
+                }
+                else {
+                    courseMap.put(root.getSemesterNumber(), root.course.getSpringCost());
+                }
+            }
+            //System.out.println(root.course.getCourseNumber() + " : "+ root.getSemesterNumber() + " : "+root.getTotalCost());
+            root = root.parent;
         }
-    }
+        
+        for (Map.Entry<Integer, ArrayList<Integer>> entry : resultMap.entrySet()) {
+            String key = entry.getKey().toString();        
+            ArrayList<Integer> value = entry.getValue();
+            System.out.println(value.size() +"  "+ value);            
+        }
+        
+        for (Map.Entry<Integer, Integer> entry : courseMap.entrySet()) {
+            String key = entry.getKey().toString();        
+            Integer value = entry.getValue();
+            System.out.print(value + " ");            
+        }
+        System.out.println();
+    }   
 }
