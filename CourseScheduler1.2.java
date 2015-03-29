@@ -51,7 +51,7 @@ import java.util.Set;
     public static void main(String args[])
     	throws IOException
     {
-        File file = new File("fourthScenario.txt");
+        File file = new File("thirdScenario.txt");
         BufferedReader br =
                 new BufferedReader(new FileReader(file));
         Student student = new Student();

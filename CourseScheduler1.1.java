@@ -13,21 +13,19 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.PriorityQueue;
-import java.util.Set;
 
 /**
  *
  * @author panindra
  */
 
-public class CourseScheduler1 {
+ class CourseScheduler111 {
 
     /**
      * @param args the command line arguments
@@ -35,12 +33,12 @@ public class CourseScheduler1 {
     static HashMap<Integer, Boolean> mCompletedCourseMap = new HashMap<Integer, Boolean>();
     static HashMap<Integer, Integer> mPrerequisitesMap = new HashMap<Integer, Integer>();
     static ArrayList<Integer> mInterestingCourseList = new ArrayList<>();
-    static Set<Course> mAllCourses = new HashSet<Course>();
+    static ArrayList<Course> mAllCourses = new ArrayList<Course>();
     static int mInterestingCourseCounter = 0;
     
     static PriorityQueue<Course> mFallPriorityQueue;
     static PriorityQueue<Course> mSpringPriorityQueue;
-   
+    static String mValue = null;
     static int mTotalCostOfCOurses = 0;    
     static int mCmax = 50;
     static int mCmin = 10;
@@ -50,7 +48,7 @@ public class CourseScheduler1 {
     public static void main(String args[])
     	throws IOException
     {
-        File file = new File("firstScenario.txt");
+        File file = new File("fourthScenario.txt");
         BufferedReader br =
                 new BufferedReader(new FileReader(file));
         Student student = new Student();
@@ -80,8 +78,8 @@ public class CourseScheduler1 {
             String prereqLine = br.readLine();
             if("0".equals(prereqLine)) continue;
             String[] prereqs = prereqLine.split(" ");
-            Set<Course> prereqSet = courseArray[i].getPrerequistes();
-            if(prereqSet == null) prereqSet = new HashSet<Course>();
+            ArrayList<Course> prereqSet = courseArray[i].getPrerequistes();
+            if(prereqSet == null) prereqSet = new ArrayList<Course>();
             
             for(int j = 1 ; j < prereqs.length ; j ++)
             {
@@ -96,7 +94,7 @@ public class CourseScheduler1 {
         
         student.allCourses = mAllCourses;
         String[] interstingCoursesStrArr = br.readLine().split(" ");
-        student.interestingCourses = new HashSet<Course>();
+        student.interestingCourses = new ArrayList<Course>();
         for(String interestingCourseStr : interstingCoursesStrArr)
         {
             if(interestingCourseStr == interstingCoursesStrArr[0])
@@ -134,7 +132,7 @@ public class CourseScheduler1 {
         
         
         for(Course course : mAllCourses) {
-            Set<Course> prereqSet = course.getPrerequistes();
+            ArrayList<Course> prereqSet = course.getPrerequistes();
             if(prereqSet != null) {
                 for(Course prereq: prereqSet) {
                    // if(course.isInteresting()) {
@@ -167,23 +165,29 @@ public class CourseScheduler1 {
                 if(course.isInteresting() && course.getPrerequistes() == null){
                     root.course = course;
                     root.parent = null;
+                    root.setTotalCost(root.course.getFallCost());
                     root.child = new ArrayList<>();
                     root.setSemesterNumber(1);
                     break;
                 }
             }
-            recursiveBacktracking(root);            
+            recursiveBacktracking(root); 
+            
        //}
     }
     
     static void recursiveBacktracking(CourseTreeNode root) {
         if(mInterestingCourseCompleted) {
+            if(mValue == null) {
+                printTree(root);
+                mValue = "not null";
+            }
             return;
         }
         root.finishedCourses.add(root.course.getCourseNumber());
         ArrayList<Course> childCourses = new ArrayList<>();
         childCourses = giveInterestingCourses(root, mAllCourses);
-        System.out.println("CUrrent root :" + root.course.getCourseNumber() + " : Current semester : " +root.getSemesterNumber());
+        //System.out.println("CUrrent root :" + root.course.getCourseNumber() + " : Current semester : " +root.getSemesterNumber());
         
        /* for(int i = 0; i < childCourses.size(); i++) {
             System.out.println("CHildren of root :" + childCourses.get(i).getCourseNumber());
@@ -197,7 +201,7 @@ public class CourseScheduler1 {
             if(!checkAddCourse) {
                 ctNode.setSemesterNumber(root.getSemesterNumber());
                 
-                Set<Course> prereqSet = childCourses.get(i).getPrerequistes();
+                ArrayList<Course> prereqSet = childCourses.get(i).getPrerequistes();
                 CourseTreeNode checkRoot = new CourseTreeNode();
                 checkRoot = root;
                 boolean flag = false;
@@ -223,6 +227,17 @@ public class CourseScheduler1 {
             ctNode.child = new  ArrayList<>();
             ctNode.parent = root;
             ctNode.finishedCourses.addAll(root.finishedCourses);
+            
+            semesterType type = semesterType.FALL;
+            int currentCost = ctNode.course.getSpringCost();
+            if(ctNode.getSemesterNumber() %2 == 0) {
+                type = semesterType.SPRING;
+                ctNode.setTotalCost(ctNode.course.getSpringCost() + root.getTotalCost());
+            }
+            else {
+                currentCost = ctNode.course.getFallCost();
+                ctNode.setTotalCost(ctNode.course.getFallCost() + root.getTotalCost());
+            }
             
             root.child.add(ctNode);            
             
@@ -266,7 +281,7 @@ public class CourseScheduler1 {
         return false;
     }
     
-    static ArrayList<Course> giveInterestingCourses(CourseTreeNode ctNode, Set <Course> allCourses ) {
+    static ArrayList<Course> giveInterestingCourses(CourseTreeNode ctNode, ArrayList <Course> allCourses ) {
         
         ArrayList<Course> nextCourseList = new ArrayList<>();
         for(Course course : allCourses){
@@ -318,7 +333,7 @@ public class CourseScheduler1 {
     static private boolean checkIfPrerequisitesCompleted(Course course, ArrayList<Integer> finishedList) {
         //System.out.println("inside Check prereq : ");
         //System.out.println    (course.getCourseNumber());
-        Set<Course> prereqSet = course.getPrerequistes();
+        ArrayList<Course> prereqSet = course.getPrerequistes();
         if(prereqSet != null){
             for(Course prerequisite : prereqSet) {
 
@@ -374,4 +389,53 @@ public class CourseScheduler1 {
         
         return currentPrice < nextSemPrice;
     }
+    
+       static public void printTree(CourseTreeNode node) {
+        System.out.println(node.parent.getTotalCost() + "  " + node.getSemesterNumber());
+        CourseTreeNode root = node.parent;
+        Map<Integer, ArrayList<Integer>> resultMap = new HashMap<Integer, ArrayList<Integer>>();
+        Map<Integer, Integer> courseMap = new HashMap<Integer, Integer>();
+        //ArrayList<Integer> values = new ArrayList<Integer>();
+        
+        while(root != null) {
+            if(resultMap.containsKey(root.getSemesterNumber())) {
+                ArrayList<Integer> values = resultMap.get(root.getSemesterNumber());
+                values.add(root.course.getCourseNumber());
+                resultMap.put(root.getSemesterNumber(), values);
+                int previousCost = courseMap.get(root.getSemesterNumber());
+                if(root.getSemesterNumber() %2 == 1) {                    
+                    courseMap.put(root.getSemesterNumber(), previousCost + root.course.getFallCost());
+                }
+                else {
+                    courseMap.put(root.getSemesterNumber(), previousCost + root.course.getSpringCost());
+                }
+            }
+            else {
+                ArrayList<Integer> values = new ArrayList<Integer>();
+                values.add(root.course.getCourseNumber());
+                resultMap.put(root.getSemesterNumber(), values);
+                if(root.getSemesterNumber() %2 == 1) {                    
+                    courseMap.put(root.getSemesterNumber(), root.course.getFallCost());
+                }
+                else {
+                    courseMap.put(root.getSemesterNumber(), root.course.getSpringCost());
+                }
+            }
+            //System.out.println(root.course.getCourseNumber() + " : "+ root.getSemesterNumber() + " : "+root.getTotalCost());
+            root = root.parent;
+        }
+        
+        for (Map.Entry<Integer, ArrayList<Integer>> entry : resultMap.entrySet()) {
+            String key = entry.getKey().toString();        
+            ArrayList<Integer> value = entry.getValue();
+            System.out.println(value.size() +"  "+ value);            
+        }
+        
+        for (Map.Entry<Integer, Integer> entry : courseMap.entrySet()) {
+            String key = entry.getKey().toString();        
+            Integer value = entry.getValue();
+            System.out.print(value + " ");            
+        }
+        System.out.println();
+    }   
 }
