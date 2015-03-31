@@ -6,6 +6,8 @@
 package coursescheduler1;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.PriorityQueue;
 import java.util.Set;
 
@@ -13,27 +15,28 @@ import java.util.Set;
  *
  * @author panindra
  */
-public class CourseSchedulerSemesteronepointtwo {
+public class CourseSchedulerSemesteronepointthree {
 
     private ArrayList<Integer> mInterestingCourseList = new ArrayList<>();
     private ArrayList<Course> mAllCourses = new ArrayList<Course>();
 
     private int mCompleteAssignment = 0;
     private int mAttemptedAssignment = 0;
-    private boolean mFoundpath = false;
 
     private PriorityQueue<TreeNode> mPathPriorityQueue;
 
+    private HashMap<ArrayList<Integer>, Integer> mCourseCompletedMapInSem = new HashMap<ArrayList<Integer>, Integer>();
+    //static HashMap<ArrayList<Integer>, Integer> mCourseCompletedMapInSem = new HashMap<ArrayList<Integer>, Integer>(); 
     private int mBudget = 0;
     private int mCmax = 50;
     private int mCmin = 10;
+    private boolean mInterestingCourseCompleted = false;
 
     public void computeCourseSchedule(ArrayList<Course> allCourses, ArrayList<Set<Course>> possibleCombs, PriorityQueue<TreeNode> pathPriorityQueue, ArrayList<Integer> interestingList, int budget) {
         mAllCourses = allCourses;
         mPathPriorityQueue = pathPriorityQueue;
         mInterestingCourseList = interestingList;
         mBudget = budget;
-        mFoundpath = false;
 
         for (Set<Course> combination : possibleCombs) {
             TreeNode cTNode = new TreeNode();
@@ -56,9 +59,6 @@ public class CourseSchedulerSemesteronepointtwo {
     }
 
     void recursivebacktracking(TreeNode ctNode) {
-        if (mFoundpath) {
-            return;
-        }
         mAttemptedAssignment++;
         ArrayList<Set<Course>> allowableCombs = Util.getCombinations(mAllCourses, ctNode.courseSet, ctNode.semesterNumber);
         for (Set<Course> combination : allowableCombs) {
@@ -83,16 +83,51 @@ public class CourseSchedulerSemesteronepointtwo {
                 mCompleteAssignment++;
             }
 
+            TreeNode existingNode = mPathPriorityQueue.peek();
+            if (pruneTree(ctNode)) {
+                continue;
+            }
+
+            if (existingNode != null && (existingNode.totalCost < childNode.totalCost)) {
+                continue;
+            }
+
             if (childNode.totalCost > mBudget) {
                 continue;
             }
 
-            if (Util.checkIfInterestedCompelted(mInterestingCourseList, combination) && !mFoundpath) {
+            if (Util.checkIfInterestedCompelted(mInterestingCourseList, combination)) {
                 mPathPriorityQueue.add(childNode);
-                mFoundpath = true;
-                return;
+                continue;
             }
+
             recursivebacktracking(childNode);
         }
+        //recursivebacktracking();        
     }
+
+    boolean pruneTree(TreeNode node) {
+        ArrayList<Integer> courseNumArr = new ArrayList<>();
+        for (Course course : node.courseSet) {
+            courseNumArr.add(course.getCourseNumber());
+        }
+
+        if (!courseNumArr.isEmpty()) {
+            Collections.sort(courseNumArr);
+            if (mCourseCompletedMapInSem.containsKey(courseNumArr)) {
+                Integer existingTotalCosts = mCourseCompletedMapInSem.get(courseNumArr);
+                ///int val = mCourseCompletedMapInSem.get(courseNumArr);
+
+                if (existingTotalCosts >= node.totalCost) {
+                    mCourseCompletedMapInSem.put(courseNumArr, node.totalCost);
+                } else if (node.totalCost > existingTotalCosts) {
+                    return true;
+                }
+            } else {
+                mCourseCompletedMapInSem.put(courseNumArr, node.totalCost);
+            }
+        }
+        return false;
+    }
+
 }
