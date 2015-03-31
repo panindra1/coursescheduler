@@ -26,40 +26,25 @@ import java.util.Set;
  *
  * @author panindra
  */
-class TreeNode {
-    Set<Course> courseSet;
-    TreeNode parent;
-    int totalCost;
-    int semesterNumber;
-    
-    public TreeNode() {
-        parent = null;
-    }
-     
-}
-
-public class CourseSchedulerSemester {   
+public class CourseSchedulerSemesteronepointone {   
     static ArrayList<Integer> mInterestingCourseList = new ArrayList<>();
     static ArrayList<Course> mAllCourses = new ArrayList<Course>();
-   
     static int mCompleteAssignment = 0;
     static int mAttemptedAssignment = 0;
     
     static PriorityQueue<TreeNode> mPathPriorityQueue;
-   
-    static HashMap<ArrayList<Integer>, Integer> mCourseCompletedMapInSem = new HashMap<ArrayList<Integer>, Integer>();
-    //static HashMap<ArrayList<Integer>, Integer> mCourseCompletedMapInSem = new HashMap<ArrayList<Integer>, Integer>(); 
+    static boolean mFoundpath = false;
     static int mTotalMinCostOfCOurses = 0;    
     static int mBudget = 0;    
     static int mCmax = 50;
     static int mCmin = 10;
     static boolean mInterestingCourseCompleted = false;
- 
+    static int minTillNow = Integer.MAX_VALUE;
     
     public static void main(String args[])
     	throws IOException
     {
-        File file = new File("secondScenario.txt");
+        File file = new File("fourthScenario.txt");
         BufferedReader br =
                 new BufferedReader(new FileReader(file));
         int numOfCourses = Integer.parseInt(br.readLine().split(" ")[0]);
@@ -78,8 +63,7 @@ public class CourseSchedulerSemester {
             courseArray[i] = course;
             mAllCourses.add(course);
         }
-         
-        //student.setAllCourses(allCourses);
+                 
         for(int i = 1; i <= numOfCourses ; i ++)
         {
             String prereqLine = br.readLine();
@@ -98,19 +82,18 @@ public class CourseSchedulerSemester {
             }
             courseArray[i].setPrerequistes(prereqSet);
         }
-               
-        String[] interstingCoursesStrArr = br.readLine().split(" ");
-        
+                
+        String[] interstingCoursesStrArr = br.readLine().split(" ");        
         for(String interestingCourseStr : interstingCoursesStrArr)
         {
             if(interestingCourseStr == interstingCoursesStrArr[0])
                 continue;
-            Course course = courseArray[Integer.parseInt(interestingCourseStr)];        
+            Course course = courseArray[Integer.parseInt(interestingCourseStr)];            
             course.setInteresting(true);
             mInterestingCourseList.add(course.getCourseNumber());
         }
-        mBudget = Integer.parseInt(br.readLine());        
-        
+        mBudget = Integer.parseInt(br.readLine());
+                
         mPathPriorityQueue = new PriorityQueue<TreeNode>(10, new Comparator<TreeNode>(){
                 public int compare(TreeNode o1, TreeNode o2) {                
                     if(o1.totalCost > o2.totalCost) {
@@ -120,7 +103,7 @@ public class CourseSchedulerSemester {
                         return -1;
                     }
                 }
-            });      
+            });            
         
         int semesterCounter = 1;
                      
@@ -138,6 +121,7 @@ public class CourseSchedulerSemester {
             }
             cTNode.totalCost = totalCost;
             recursivebacktracking(cTNode);
+            break;
         }
         System.out.println(mPathPriorityQueue.peek().totalCost + " "+ mPathPriorityQueue.peek().semesterNumber);
         printTree(mPathPriorityQueue.peek());
@@ -147,6 +131,9 @@ public class CourseSchedulerSemester {
     
     static void recursivebacktracking(TreeNode ctNode) {                
         mAttemptedAssignment++;
+        if(mFoundpath) {
+            return;
+        }
         ArrayList<Set<Course>> allowableCombs = getCombinations(ctNode.courseSet, ctNode.semesterNumber);
         for(Set<Course> combination : allowableCombs) {            
             
@@ -164,29 +151,16 @@ public class CourseSchedulerSemester {
             }
             
             childNode.totalCost = totalCost + ctNode.totalCost;
-            combination.addAll(ctNode.courseSet);
-            if(checkIfInterestedCompelted(combination)) {
-                mCompleteAssignment++;                
-            }
-                
+            combination.addAll(ctNode.courseSet);                
             
-            TreeNode existingNode = mPathPriorityQueue.peek();
-            if(pruneTree(ctNode)) {
-                continue;
-            }
+            TreeNode existingNode = mPathPriorityQueue.peek();            
             
-            if(existingNode != null && (existingNode.totalCost < childNode.totalCost) ) {
-                continue;
-            }
-            
-            if(childNode.totalCost > mBudget){
-                continue;
-            }
-            
-            
-            if(checkIfInterestedCompelted(combination)) {                                 
+            if(checkIfInterestedCompelted(combination) && !mFoundpath) {                                 
                 mPathPriorityQueue.add(childNode); 
-                continue;
+                //continue;
+                mCompleteAssignment++;                
+                mFoundpath = true;
+                return;
             }
             
             recursivebacktracking(childNode);
@@ -351,7 +325,7 @@ public class CourseSchedulerSemester {
     }		
     return sets;
 }
-         
+     
      static boolean checkIfPrereqCompleted(Set<Course> completedCourses, Course currentCourse){
          ArrayList<Course> preReqs = new ArrayList<>();
          preReqs = currentCourse.getPrerequistes();
@@ -367,32 +341,5 @@ public class CourseSchedulerSemester {
          }
          return true;
          
-     }
-     
-     static boolean pruneTree(TreeNode node) {        
-        ArrayList<Integer> courseNumArr = new ArrayList<>();
-        for(Course course: node.courseSet) {
-            courseNumArr.add(course.getCourseNumber());
-        }
-        
-        if(!courseNumArr.isEmpty()) {            
-            Collections.sort(courseNumArr);
-            if(mCourseCompletedMapInSem.containsKey(courseNumArr)) {                
-                Integer existingTotalCosts = mCourseCompletedMapInSem.get(courseNumArr);
-                ///int val = mCourseCompletedMapInSem.get(courseNumArr);
-                
-                if(existingTotalCosts >= node.totalCost) {                        
-                    mCourseCompletedMapInSem.put(courseNumArr, node.totalCost);                
-                } 
-                else if (node.totalCost > existingTotalCosts){
-                    return true;
-                }                
-            }
-            else {            
-                mCourseCompletedMapInSem.put(courseNumArr, node.totalCost);                
-            }
-        }                
-        return false;
-    }
-    
+     }          
 }
