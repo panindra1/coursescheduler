@@ -1,6 +1,5 @@
-package coursescheduler;
-import java.util.List;
-import java.util.Set;
+package coursescheduler1;
+import java.util.ArrayList;
 
 /*
  * To change this license header, choose License Headers in Project Properties.
@@ -13,8 +12,7 @@ import java.util.Set;
  */
 public class Course {
     private int creditHours;
-    private int courseNumber;
-
+    private int courseNumber;        
     public int getCourseNumber() {
         return courseNumber;
     }
@@ -24,9 +22,19 @@ public class Course {
     }
     private int springCost;
     private int fallCost;
-    private List<Boolean> completedPrerequistes;
+    
+    
     private boolean interesting;
-    private Set<Course> prerequistes;
+    private boolean impPreRequisite;
+
+    public boolean isImpPreRequisite() {
+        return impPreRequisite;
+    }
+
+    public void setImpPreRequisite(boolean impPreRequisite) {
+        this.impPreRequisite = impPreRequisite;
+    }
+    private ArrayList<Course> prerequistes;
 
     Course() {
     }
@@ -63,11 +71,11 @@ public class Course {
         this.fallCost = fallCost;
     }
 
-    public Set<Course> getPrerequistes() {
+    public ArrayList<Course> getPrerequistes() {
         return prerequistes;
     }
 
-    public void setPrerequistes(Set<Course> prerequistes) {
+    public void setPrerequistes(ArrayList<Course> prerequistes) {
         this.prerequistes = prerequistes;
     }
 
