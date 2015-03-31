@@ -16,18 +16,15 @@ import java.util.Set;
 public class CourseSchedulerSemesteronepointtwo {
 
     private ArrayList<Integer> mInterestingCourseList = new ArrayList<>();
-    private ArrayList<Course> mAllCourses = new ArrayList<Course>();
+    private ArrayList<Course> mAllCourses = new ArrayList<>();
 
     private int mCompleteAssignment = 0;
     private int mAttemptedAssignment = 0;
     private boolean mFoundpath = false;
 
     private PriorityQueue<TreeNode> mPathPriorityQueue;
-
     private int mBudget = 0;
-    private int mCmax = 50;
-    private int mCmin = 10;
-
+    
     public void computeCourseSchedule(ArrayList<Course> allCourses, ArrayList<Set<Course>> possibleCombs, PriorityQueue<TreeNode> pathPriorityQueue, ArrayList<Integer> interestingList, int budget) {
         mAllCourses = allCourses;
         mPathPriorityQueue = pathPriorityQueue;

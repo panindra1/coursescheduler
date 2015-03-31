@@ -22,15 +22,9 @@ public class CourseSchedulerSemesteronepointthree {
 
     private int mCompleteAssignment = 0;
     private int mAttemptedAssignment = 0;
-
     private PriorityQueue<TreeNode> mPathPriorityQueue;
-
-    private HashMap<ArrayList<Integer>, Integer> mCourseCompletedMapInSem = new HashMap<ArrayList<Integer>, Integer>();
-    //static HashMap<ArrayList<Integer>, Integer> mCourseCompletedMapInSem = new HashMap<ArrayList<Integer>, Integer>(); 
+    private HashMap<ArrayList<Integer>, Integer> mCourseCompletedMapInSem = new HashMap<ArrayList<Integer>, Integer>();    
     private int mBudget = 0;
-    private int mCmax = 50;
-    private int mCmin = 10;
-    private boolean mInterestingCourseCompleted = false;
 
     public void computeCourseSchedule(ArrayList<Course> allCourses, ArrayList<Set<Course>> possibleCombs, PriorityQueue<TreeNode> pathPriorityQueue, ArrayList<Integer> interestingList, int budget) {
         mAllCourses = allCourses;

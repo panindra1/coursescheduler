@@ -21,11 +21,8 @@ public class CourseSchedulerSemesteronepointone {
     private int mCompleteAssignment = 0;
     private int mAttemptedAssignment = 0;
     
-    private PriorityQueue<TreeNode> mPathPriorityQueue;
-    private int mTotalMinCostOfCOurses = 0;    
+    private PriorityQueue<TreeNode> mPathPriorityQueue;    
     private int mBudget = 0;    
-    private int mCmax = 50;
-    private int mCmin = 10;    
     private boolean mFoundpath = false;
     
     public void computeCourseSchedule(ArrayList<Course> allCourses, ArrayList<Set<Course>> possibleCombs, PriorityQueue<TreeNode> pathPriorityQueue, ArrayList<Integer> interestingList, int budget) {
